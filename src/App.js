@@ -6,16 +6,16 @@ export default function App() {
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
-    fetch("https://restcountries.com/v3.1/all?fields=name,flags,cca3")
+    fetch("https://xcountries-backend.azurewebsites.net/all")
       .then((res) => res.json())
       .then((data) => setCountryData(data))
       .catch((error) => {
-        console.error(error.message);
+        console.error("API Error:", error.message);
       });
   }, []);
 
   const filteredCountries = countryData.filter((country) =>
-    country.name?.common?.toLowerCase().includes(searchTerm.toLowerCase())
+    country.name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const container = {
@@ -47,22 +47,27 @@ export default function App() {
     <>
       <input
         type="text"
-        placeholder="Search countries..."
+        placeholder="Search for a country"
+        aria-label="country-search"
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
         style={{ padding: "10px", margin: "20px", width: "300px" }}
       />
       <div style={container}>
-        {filteredCountries.map((country) => (
-          <div key={country.cca3} style={card} data-testid="country-card">
-            <img
-              src={country.flags?.png}
-              alt={`Flag of ${country.name?.common}`}
-              style={flag}
-            />
-            <h2>{country.name?.common}</h2>
-          </div>
-        ))}
+        {filteredCountries.length === 0 ? (
+          <p>No results found</p>
+        ) : (
+          filteredCountries.map((country) => (
+            <div key={country.code} style={card} data-testid="country-card">
+              <img
+                src={country.flag}
+                alt={`Flag of ${country.name}`}
+                style={flag}
+              />
+              <h2>{country.name}</h2>
+            </div>
+          ))
+        )}
       </div>
     </>
   );
